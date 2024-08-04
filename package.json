@@ -1,0 +1,13 @@
+{
+  "name": "wawawa",
+  "private": true,
+  "packageManager": "pnpm@9.2.0",
+  "workspaces": ["api/*", "web/*"],
+  "scripts": {
+    "lint": "biome lint .",
+    "format": "pnpm biome format . --write && pnpm biome check . --write --unsafe"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.8.3"
+  }
+}

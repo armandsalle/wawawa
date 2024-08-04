@@ -1,0 +1,18 @@
+# Ignore node_modules directory
+node_modules/
+
+.env
+.env.*
+!.env.sample
+!.env.test
+
+# Ignore built output
+dist/
+build/
+
+# Ignore logs and debugging files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
