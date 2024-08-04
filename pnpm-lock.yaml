@@ -42,6 +42,9 @@ importers:
 
   web:
     dependencies:
+      hono:
+        specifier: ^4.5.3
+        version: 4.5.3
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -64,6 +67,9 @@ importers:
       '@vitejs/plugin-react':
         specifier: ^4.3.1
         version: 4.3.1(vite@5.3.5(@types/node@20.12.14))
+      '@wawawa/api':
+        specifier: workspace:*
+        version: link:../api
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
