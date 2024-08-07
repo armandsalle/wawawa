@@ -1,5 +1,7 @@
 import { sql } from "drizzle-orm";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { createInsertSchema } from "drizzle-valibot";
+import * as v from "valibot";
 
 export const usersTable = sqliteTable("users", {
   id: integer("id").primaryKey(),
@@ -26,6 +28,11 @@ export const postsTable = sqliteTable("posts", {
   ),
 });
 
+const EmailSchema = v.pipe(v.string(), v.trim(), v.email());
+export const insertUserSchema = v.object({
+  name: v.pipe(v.string(), v.trim(), v.minLength(1)),
+  email: EmailSchema,
+});
 export type InsertUserRecordType = typeof usersTable.$inferInsert;
 export type UserRecordType = typeof usersTable.$inferSelect;
 

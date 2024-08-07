@@ -4,12 +4,14 @@ import { migrate as libsqlMigrator } from "drizzle-orm/libsql/migrator";
 import { env } from "../env";
 import { logger } from "../logger";
 
-const client = createClient({
-  url: env.TURSO_CONNECTION_URL,
-  authToken: env.TURSO_AUTH_TOKEN,
+export const dbClient = createClient({
+  url: "http://127.0.0.1:8080",
+  // authToken: env.TURSO_AUTH_TOKEN,
+  syncUrl: env.TURSO_CONNECTION_URL,
+  syncInterval: 15,
 });
 
-export const db = drizzle(client);
+export const db = drizzle(dbClient);
 
 export function migrate(migrationsDir: string) {
   logger.info(

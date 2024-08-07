@@ -5,16 +5,20 @@
   "types": "src/index.ts",
   "scripts": {
     "dev": "bun run --hot src/index.ts",
+    "db:run": "turso dev --db-file local.db",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate"
   },
   "dependencies": {
+    "@hono/valibot-validator": "^0.3.0",
     "@libsql/client": "^0.8.1",
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.32.2",
+    "drizzle-valibot": "^0.2.0",
     "hono": "^4.5.4",
     "pino": "^9.3.2",
-    "pino-pretty": "^11.2.2"
+    "pino-pretty": "^11.2.2",
+    "valibot": "^0.37.0"
   },
   "devDependencies": {
     "@types/bun": "latest",

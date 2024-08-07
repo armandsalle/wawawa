@@ -5,3 +5,6 @@ node_modules/
 .env.*
 !.env.sample
 !.env.test
+
+*.db
+*.db-*

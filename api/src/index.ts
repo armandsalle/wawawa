@@ -4,13 +4,14 @@ import { cors } from "hono/cors";
 import { showRoutes } from "hono/dev";
 import { logger as honoLogger } from "hono/logger";
 import { appRouter } from "./app/router";
-import { migrate } from "./db";
+import { dbClient, migrate } from "./db";
 import { isDev } from "./env";
 import { logger } from "./logger";
 
 /**
  * Migrate the database before starting the server.
  */
+// await dbClient.sync();
 const cwd = path.dirname(__dirname);
 const migrationsDir = path.join(cwd, "src/db/migrations");
 await migrate(migrationsDir);
