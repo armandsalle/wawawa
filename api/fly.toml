@@ -7,6 +7,7 @@ app = 'api-wawawa'
 primary_region = 'cdg'
 
 [build]
+  dockerfile = "Dockerfile"
 
 [http_service]
   internal_port = 3000

@@ -1,36 +1,32 @@
-# syntax = docker/dockerfile:1
-
-# Adjust BUN_VERSION as desired
-FROM oven/bun:latest as base
-
-LABEL fly_launch_runtime="Bun"
+FROM node:20-slim AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 RUN apt-get update \
- && apt-get install -y --no-install-recommends ca-certificates -y build-essential pkg-config python-is-python3
+ && apt-get install -y --no-install-recommends ca-certificates
 
-# Bun app lives here
 WORKDIR /app
-COPY . /app
+COPY api/ api/
+COPY package.json .
+COPY pnpm-lock.yaml .
+COPY pnpm-workspace.yaml .
 
-# Set production environment
-ENV NODE_ENV="production"
-
-
+#========================
 FROM base AS prod-deps
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
 
+#====================
 FROM base AS build
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
-RUN pnpm run build
+COPY . .
 
-# Final stage for app image
-FROM base
+LABEL fly_launch_runtime="Bun"
+FROM oven/bun:latest
+WORKDIR /app
 
-# Copy built application
-COPY --from=build /app/build /app/build
+ENV NODE_ENV="production"
+COPY --from=build /app ./
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
-CMD [ "bun", "build/index.js" ]
+CMD [ "bun", "api/src/index.ts" ]
