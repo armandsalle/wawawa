@@ -5,7 +5,8 @@
   "workspaces": ["api/*", "web/*"],
   "scripts": {
     "lint": "biome lint .",
-    "format": "pnpm biome format . --write && pnpm biome check . --write --unsafe"
+    "format": "pnpm biome format . --write && pnpm biome check . --write --unsafe",
+    "deploy:api": "fly deploy --config ./api/fly.toml --dockerfile ./api/Dockerfile"
   },
   "devDependencies": {
     "@biomejs/biome": "1.8.3"
