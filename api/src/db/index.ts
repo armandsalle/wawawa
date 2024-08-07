@@ -1,13 +1,13 @@
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 import { migrate as libsqlMigrator } from "drizzle-orm/libsql/migrator";
-import { env } from "../env";
+import { env, isDev } from "../env";
 import { logger } from "../logger";
 
 export const dbClient = createClient({
-  url: "http://127.0.0.1:8080",
-  // authToken: env.TURSO_AUTH_TOKEN,
-  syncUrl: env.TURSO_CONNECTION_URL,
+  url: isDev ? "http://127.0.0.1:8080" : env.TURSO_CONNECTION_URL,
+  authToken: isDev ? undefined : env.TURSO_AUTH_TOKEN,
+  syncUrl: isDev ? env.TURSO_CONNECTION_URL : undefined,
   syncInterval: 15,
 });
 
