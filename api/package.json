@@ -6,7 +6,6 @@
   "scripts": {
     "dev": "bun run --hot src/index.ts",
     "build": "bun build ./src/index.ts --outdir ./build --target bun --minify",
-    "db:run": "turso dev --db-file local.db",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate"
   },
