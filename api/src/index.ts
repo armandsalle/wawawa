@@ -35,6 +35,9 @@ app.get("/", (c) => {
 app.get("/ping", (c) => {
   return c.text("PONG");
 });
+app.get("/health", (c) => {
+  return c.json({ status: "ok" });
+});
 
 const route = app.route("/api/v1", appRouter);
 
