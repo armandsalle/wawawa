@@ -1,4 +1,4 @@
-import path from "node:path";
+import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { showRoutes } from "hono/dev";
@@ -6,13 +6,12 @@ import { logger as honoLogger } from "hono/logger";
 import { appRouter } from "./app/router";
 import { migrate } from "./db";
 import { isDev } from "./env";
+import { migrationsDir } from "./helpers";
 import { logger } from "./logger";
 
 /**
  * Migrate the database before starting the server.
  */
-const cwd = path.dirname(__dirname);
-const migrationsDir = path.join(cwd, "src/db/migrations");
 await migrate(migrationsDir);
 
 /**
@@ -35,5 +34,6 @@ if (isDev) {
 
 const port = 3000;
 logger.info(`Starting server on port ${port}`);
+
+export default serve({ port, fetch: app.fetch });
 export type AppType = typeof route;
-export default { port, fetch: app.fetch };

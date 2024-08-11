@@ -18,15 +18,16 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-l
 #====================
 FROM base AS build
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN cd api && pnpm run build
 COPY . .
 
-LABEL fly_launch_runtime="Bun"
-FROM oven/bun:latest
+LABEL fly_launch_runtime="Node"
+FROM node:20-slim AS base
 WORKDIR /app
 
 ENV NODE_ENV="production"
-COPY --from=build /app ./
+COPY --from=build /app/dist ./
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
-CMD [ "bun", "api/src/index.ts" ]
+CMD [ "node", "index.js" ]

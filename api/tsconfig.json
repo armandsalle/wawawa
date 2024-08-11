@@ -1,9 +1,9 @@
 {
   "include": ["src", "*.ts", "**/*.ts"],
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules", "dist"],
   "compilerOptions": {
+    "target": "ES2022",
     "module": "ESNext",
-    "target": "ESNext",
     "composite": false,
     "declaration": true,
     "declarationMap": true,
@@ -11,13 +11,14 @@
     "forceConsistentCasingInFileNames": true,
     "inlineSources": false,
     "isolatedModules": true,
-    "moduleResolution": "node",
+    "moduleResolution": "Bundler",
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "preserveWatchOutput": true,
     "skipLibCheck": true,
     "strict": true,
     "strictNullChecks": true,
-    "types": ["@types/bun"]
+    "types": ["@types/node"],
+    "outDir": "./dist"
   }
 }
