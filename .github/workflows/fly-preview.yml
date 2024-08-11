@@ -1,12 +1,13 @@
 name: Fly Deploy Preview Api
 on:
   pull_request:
-    types: [opened, reopened, synchronize, closed]
+    types: [opened, reopened, synchronize]
 
 env:
   FLY_API_TOKEN: ${{ secrets.FLY_AUTH_TOKEN }}
   FLY_REGION: cdg
   FLY_ORG: personal
+  FLY_APP_NAME: pr-${{ github.event.number }}-wawawa-api
 
 jobs:
   staging_app:
@@ -17,6 +18,15 @@ jobs:
       group: pr-${{ github.event.number }}
 
     steps:
+
+      - name: Comment on PR with URLs
+        if: github.event.action == 'opened'
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: |
+            🖥 [API URL](https://${{ env.FLY_APP_NAME }}.fly.dev/)
+            🎈 [Fly console](https://fly.io/apps/${{ env.FLY_APP_NAME }}/monitoring)
+
       - uses: actions/checkout@v4
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - uses: actions/setup-node@v4
@@ -28,15 +38,4 @@ jobs:
           INPUT_SECRETS: |
             TURSO_CONNECTION_URL=${{ secrets.TURSO_CONNECTION_URL }}
             TURSO_AUTH_TOKEN=${{ secrets.TURSO_AUTH_TOKEN }}
-        run: npx zx ./actions/fly-deploy-preview/run.js --appName pr-${{ github.event.number }}-wawawa-api
-
-  destroy_app:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-      - uses: superfly/flyctl-actions/setup-flyctl@master
-      - run: flyctl apps destroy pr-${{ github.event.number }}-wawawa-api
-        if: ${{ github.event.action == 'closed' }}
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: npx zx ./actions/fly-deploy-preview/run.js --appName ${{ env.FLY_APP_NAME }}

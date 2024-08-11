@@ -1,0 +1,19 @@
+name: Fly Destroy Preview Api
+on:
+  pull_request:
+    types: [closed]
+
+env:
+  FLY_APP_NAME: pr-${{ github.event.number }}-wawawa-api
+
+jobs:
+  destroy_app:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: flyctl apps destroy ${{ env.FLY_APP_NAME }} --yes
+        if: ${{ github.event.action == 'closed' }}
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
