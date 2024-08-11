@@ -27,6 +27,7 @@ WORKDIR /app
 
 ENV NODE_ENV="production"
 COPY --from=build /app/api/dist ./
+COPY --from=base /app/package.json ./
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
