@@ -15,7 +15,7 @@ import { logger } from "./logger";
 await migrate(migrationsDir);
 
 /**
- * Create a new Hono app and define a route.
+ * Create a new Hono app instance.
  */
 const app = new Hono({ strict: true });
 app.use(
@@ -25,11 +25,22 @@ app.use(
   }),
 );
 app.use(honoLogger());
+
+/**
+ * Define routes.
+ */
 app.get("/", (c) => {
   return c.text("OK");
 });
+app.get("/ping", (c) => {
+  return c.text("PONG");
+});
+
 const route = app.route("/api/v1", appRouter);
 
+/**
+ * Run the app.
+ */
 if (isDev) {
   showRoutes(app, { verbose: true, colorize: true });
 }
