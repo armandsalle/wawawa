@@ -11,10 +11,6 @@ COPY package.json .
 COPY pnpm-lock.yaml .
 COPY pnpm-workspace.yaml .
 
-#========================
-FROM base AS prod-deps
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
-
 #====================
 FROM base AS build
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
@@ -26,9 +22,8 @@ FROM node:20-slim AS base
 WORKDIR /app
 
 ENV NODE_ENV="production"
-COPY --from=build /app/api/dist ./
-COPY --from=base /app/package.json ./
+COPY --from=build /app ./
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
-CMD [ "node", "index.js" ]
+CMD [ "node", "api/dist/index.js" ]
