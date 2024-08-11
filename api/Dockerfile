@@ -26,7 +26,7 @@ FROM node:20-slim AS base
 WORKDIR /app
 
 ENV NODE_ENV="production"
-COPY --from=build /app/dist ./
+COPY --from=build /app/api/dist ./
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
