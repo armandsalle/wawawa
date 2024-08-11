@@ -15,6 +15,8 @@
         --no-deploy \\
         --ha=false \\
         --region=cdg \\
+        --config "$(pwd)/api/fly.toml" \\
+        --dockerfile "$(pwd)/api/Dockerfile" \\
         --yes
       `;
   }
@@ -31,6 +33,7 @@
       --app ${appName} \\
       --ha=false \\
       --remote-only \\
+      --region=cdg
       --config "$(pwd)/api/fly.toml" \\
       --dockerfile "$(pwd)/api/Dockerfile"`;
 
