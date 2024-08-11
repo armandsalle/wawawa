@@ -21,7 +21,9 @@ const app = new Hono({ strict: true });
 app.use(
   "/api/*",
   cors({
-    origin: isDev ? "*" : "*",
+    origin: isDev
+      ? ["http://localhost:5173", "https://api-wawawa.fly.dev"]
+      : ["https://api.armand-salle.fr", "https://api-wawawa.fly.dev"],
   }),
 );
 app.use(honoLogger());
