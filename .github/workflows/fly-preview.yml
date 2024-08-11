@@ -31,8 +31,9 @@ jobs:
 
       - name: Deploy
         id: deploy
-        INPUT_SECRETS: |
-          TURSO_CONNECTION_URL=${{ secrets.TURSO_CONNECTION_URL }}
-          TURSO_AUTH_TOKEN=${{ secrets.TURSO_AUTH_TOKEN }}
+        env:
+          INPUT_SECRETS: |
+            TURSO_CONNECTION_URL=${{ secrets.TURSO_CONNECTION_URL }}
+            TURSO_AUTH_TOKEN=${{ secrets.TURSO_AUTH_TOKEN }}
         run: npx zx ../actions/fly-preview-apps/run.js --appName pr-${{ github.event.number }}-wawawa-api
         working-directory: api/
