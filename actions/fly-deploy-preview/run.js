@@ -10,7 +10,6 @@
 
   if (!alreadyExists) {
     await $`flyctl launch \\
-        --copy-config \\
         --config "$(pwd)/api/fly.toml" \\
         --name=${appName} \\
         --no-deploy \\
