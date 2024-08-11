@@ -14,10 +14,20 @@ primary_region = 'cdg'
   force_https = true
   auto_stop_machines = 'stop'
   auto_start_machines = true
-  min_machines_running = 0
+  min_machines_running = 1
   processes = ['app']
+  [http_service.concurrency]
+    type = "requests"
+    soft_limit = 200
+    hard_limit = 250
 
 [[vm]]
-  memory = '1gb'
-  cpu_kind = 'shared'
-  cpus = 1
+  memory = "1gb"
+  size = "shared-cpu-2x"
+
+[[http_service.checks]]
+  grace_period = "1min"
+  interval = "1min"
+  method = "GET"
+  timeout = "5s"
+  path = "/health"
