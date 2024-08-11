@@ -11,12 +11,11 @@
   if (!alreadyExists) {
     await $`flyctl launch \\
         --copy-config \\
+        --config "$(pwd)/api/fly.toml" \\
         --name=${appName} \\
         --no-deploy \\
         --ha=false \\
         --region=cdg \\
-        --config "$(pwd)/api/fly.toml" \\
-        --dockerfile "$(pwd)/api/Dockerfile" \\
         --yes
       `;
   }
