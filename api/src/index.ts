@@ -25,7 +25,9 @@ app.use(
   }),
 );
 app.use(honoLogger());
-
+app.get("/", (c) => {
+  return c.text("OK");
+});
 const route = app.route("/api/v1", appRouter);
 
 if (isDev) {
