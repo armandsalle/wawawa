@@ -32,7 +32,6 @@
       --app ${appName} \\
       --ha=false \\
       --remote-only \\
-      --region=cdg
       --config "$(pwd)/api/fly.toml" \\
       --dockerfile "$(pwd)/api/Dockerfile"`;
 
