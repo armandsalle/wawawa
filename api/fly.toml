@@ -26,8 +26,8 @@ primary_region = 'cdg'
   size = "shared-cpu-2x"
 
 [[http_service.checks]]
-  grace_period = "1min"
-  interval = "1min"
+  grace_period = "1m"
+  interval = "1m"
   method = "GET"
   timeout = "5s"
   path = "/health"
