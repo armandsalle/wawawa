@@ -1,7 +1,7 @@
 {
   "name": "wawawa",
   "private": true,
-  "workspaces": ["apps/*"],
+  "workspaces": ["apps/*", "packages/*"],
   "packageManager": "bun@1.1.22",
   "scripts": {
     "lint": "biome lint .",
