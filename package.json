@@ -1,8 +1,8 @@
 {
   "name": "wawawa",
   "private": true,
-  "packageManager": "pnpm@9.2.0",
-  "workspaces": ["api/*", "web/*"],
+  "workspaces": ["apps/*", "packages/*"],
+  "packageManager": "bun@1.1.22",
   "scripts": {
     "lint": "biome lint .",
     "format": "pnpm biome format . --write && pnpm biome check . --write --unsafe"
