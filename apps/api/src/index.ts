@@ -1,4 +1,3 @@
-import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { showRoutes } from "hono/dev";
@@ -53,5 +52,5 @@ if (isDev) {
 const port = 3000;
 logger.info(`Starting server on port ${port}`);
 
-export default serve({ port, fetch: app.fetch });
+export default { port, fetch: app.fetch };
 export type AppType = typeof route;

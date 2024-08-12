@@ -10,7 +10,7 @@
 
   if (!alreadyExists) {
     await $`flyctl launch \\
-        --config "$(pwd)/api/fly.toml" \\
+        --config "$(pwd)/apps/api/fly.toml" \\
         --name=${appName} \\
         --no-deploy \\
         --ha=false \\
@@ -31,8 +31,8 @@
       --app ${appName} \\
       --ha=false \\
       --remote-only \\
-      --config "$(pwd)/api/fly.toml" \\
-      --dockerfile "$(pwd)/api/Dockerfile"`;
+      --config "$(pwd)/apps/api/fly.toml" \\
+      --dockerfile "$(pwd)/apps/api/Dockerfile"`;
 
   console.log(alreadyExists);
 })();
