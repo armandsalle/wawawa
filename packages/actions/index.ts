@@ -20,8 +20,7 @@ async function flyDeployPreview() {
   const alreadyExists = apps.some((it) => it.Name === appName);
 
   if (!alreadyExists) {
-    await $`flyctl launch --config /apps/api/fly.toml --name=${appName} --no-deploy --ha=false --region=cdg --yes
-        `;
+    await $`flyctl launch --config ./apps/api/fly.toml --name=${appName} --no-deploy --ha=false --region=cdg --yes`;
   }
 
   // update secrets
@@ -35,7 +34,7 @@ async function flyDeployPreview() {
   );
   await $`cat secrets.txt | flyctl secrets import --app ${appName}`;
   // build and deploy
-  await $`flyctl deploy --app ${appName} --ha=false --remote-only --config /apps/api/fly.toml --dockerfile /apps/api/Dockerfile`;
+  await $`flyctl deploy --app ${appName} --ha=false --remote-only --config ./apps/api/fly.toml --dockerfile ./apps/api/Dockerfile`;
 }
 
 await flyDeployPreview();
