@@ -1,13 +1,20 @@
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 import { migrate as libsqlMigrator } from "drizzle-orm/libsql/migrator";
-import { env } from "../env";
+import { env, isDev } from "../env";
 import { logger } from "../logger";
 
-export const dbClient = createClient({
-  url: env.TURSO_CONNECTION_URL,
-  authToken: env.TURSO_AUTH_TOKEN,
-});
+export const dbClient = isDev
+  ? createClient({
+      url: env.TURSO_CONNECTION_URL,
+      authToken: env.TURSO_AUTH_TOKEN,
+    })
+  : createClient({
+      syncUrl: env.TURSO_CONNECTION_URL,
+      authToken: env.TURSO_AUTH_TOKEN,
+      url: "file:/app/data/replica.db",
+      syncInterval: 15,
+    });
 
 export const db = drizzle(dbClient);
 

@@ -31,3 +31,7 @@ primary_region = 'cdg'
   method = "GET"
   timeout = "5s"
   path = "/health"
+
+[[mounts]]
+source = "libsql_data"
+destination = "/app/data"
