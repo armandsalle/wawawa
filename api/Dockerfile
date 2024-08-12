@@ -23,11 +23,8 @@ WORKDIR /app
 
 ENV NODE_ENV="production"
 
-RUN addgroup --system --gid 1001 app && adduser app --system --uid 1001 --ingroup app
-
-COPY --from=build --chown=app:app /app ./
+COPY --from=build /app ./
 
 # Start the server by default, this can be overwritten at runtime
-USER 1001
 EXPOSE 3000
 CMD [ "node", "api/dist/index.js" ]
