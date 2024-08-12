@@ -19,11 +19,16 @@ COPY . .
 
 LABEL fly_launch_runtime="Node"
 FROM node:20-slim AS base
-WORKDIR /app
 
+WORKDIR /app
 ENV NODE_ENV="production"
+
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S toto -u 1001
+
 COPY --from=build /app ./
 
 # Start the server by default, this can be overwritten at runtime
+USER toto
 EXPOSE 3000
 CMD [ "node", "api/dist/index.js" ]
