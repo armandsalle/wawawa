@@ -21,7 +21,7 @@ async function flyDeployPreview() {
 
   if (!alreadyExists) {
     await $`flyctl launch \\
-          --config "$(pwd)/apps/api/fly.toml" \\
+          --config /apps/api/fly.toml \\
           --name=${appName} \\
           --no-deploy \\
           --ha=false \\
@@ -45,10 +45,8 @@ async function flyDeployPreview() {
         --app ${appName} \\
         --ha=false \\
         --remote-only \\
-        --config "$(pwd)/apps/api/fly.toml" \\
-        --dockerfile "$(pwd)/apps/api/Dockerfile"`;
-
-  console.log(alreadyExists);
+        --config /apps/api/fly.toml \\
+        --dockerfile /apps/api/Dockerfile"`;
 }
 
 await flyDeployPreview();
