@@ -12,8 +12,9 @@ export const dbClient = isDev
   : createClient({
       syncUrl: env.TURSO_CONNECTION_URL,
       authToken: env.TURSO_AUTH_TOKEN,
-      url: "file:/app/data/replica.db",
+      url: "file:replica.db",
       syncInterval: 15,
+      encryptionKey: env.TURSO_ENCRYPTION_KEY,
     });
 
 export const db = drizzle(dbClient);

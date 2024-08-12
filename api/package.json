@@ -14,11 +14,11 @@
   "dependencies": {
     "@hono/node-server": "^1.12.0",
     "@hono/valibot-validator": "^0.3.0",
-    "@libsql/client": "^0.8.1",
+    "@libsql/client": "^0.9.0",
     "dotenv": "^16.4.5",
-    "drizzle-orm": "^0.32.2",
+    "drizzle-orm": "^0.33.0",
     "drizzle-valibot": "^0.2.0",
-    "hono": "^4.5.4",
+    "hono": "^4.5.5",
     "pino": "^9.3.2",
     "pino-pretty": "^11.2.2",
     "valibot": "^0.37.0"

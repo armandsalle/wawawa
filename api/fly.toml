@@ -34,5 +34,5 @@ primary_region = 'cdg'
 
 [mounts]
 source = "libsql_data"
-destination = "/app/data"
+destination = "/data"
 processes = ["app"]
