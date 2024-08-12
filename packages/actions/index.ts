@@ -35,7 +35,7 @@ async function flyDeployPreview() {
   );
   await $`cat secrets.txt | flyctl secrets import --app ${appName}`;
   // build and deploy
-  await $`flyctl deploy --app ${appName} --ha=false --remote-only --config /apps/api/fly.toml --dockerfile /apps/api/Dockerfile"`;
+  await $`flyctl deploy --app ${appName} --ha=false --remote-only --config /apps/api/fly.toml --dockerfile /apps/api/Dockerfile`;
 }
 
 await flyDeployPreview();
