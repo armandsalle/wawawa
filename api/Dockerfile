@@ -23,8 +23,12 @@ WORKDIR /app
 
 ENV NODE_ENV="production"
 
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S toto -u 1001
+
 COPY --from=build /app ./
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
+USER toto
 CMD [ "node", "api/dist/index.js" ]
