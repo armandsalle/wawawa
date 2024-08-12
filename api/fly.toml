@@ -32,6 +32,7 @@ primary_region = 'cdg'
   timeout = "5s"
   path = "/health"
 
-[[mounts]]
+[mounts]
 source = "libsql_data"
 destination = "/app/data"
+processes = ["app"]
