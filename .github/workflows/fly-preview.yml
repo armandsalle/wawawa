@@ -36,4 +36,5 @@ jobs:
           INPUT_SECRETS: |
             TURSO_CONNECTION_URL=${{ secrets.TURSO_CONNECTION_URL }}
             TURSO_AUTH_TOKEN=${{ secrets.TURSO_AUTH_TOKEN }}
+            TURSO_ENCRYPTION_KEY=${{ secrets.TURSO_ENCRYPTION_KEY }}
         run: bun ./packages/actions/index.ts --appName ${{ env.FLY_APP_NAME }}
