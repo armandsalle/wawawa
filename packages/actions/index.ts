@@ -5,14 +5,14 @@ async function flyDeployPreview() {
   const { values } = parseArgs({
     args: Bun.argv,
     options: {
-      name: {
+      appName: {
         type: "string",
       },
     },
     strict: true,
     allowPositionals: true,
   });
-  const appName = values.name;
+  const appName = values.appName;
   if (!appName) throw new Error("need --appName");
 
   const appsStr = await $`flyctl apps list -j`.quiet().text();
