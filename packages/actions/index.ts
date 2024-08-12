@@ -34,14 +34,14 @@ async function flyDeployPreview() {
   const INPUT_SECRETS = Bun.env.INPUT_SECRETS;
   if (!INPUT_SECRETS) throw new Error("need INPUT_SECRETS");
 
-  console.log("INPUT_SECRETS", INPUT_SECRETS);
-
   const secrets = INPUT_SECRETS.replaceAll("\n", " ").split(" ");
   Bun.write(
     "secrets.txt",
     ["NODE_ENV=production", `PREVIEW_NAME=${appName}`, ...secrets].join("\n"),
   );
   await $`cat secrets.txt | flyctl secrets import --app ${appName}`;
+  //
+  await $`fly -h`;
   // build and deploy
   await $`flyctl deploy \\
         --app ${appName} \\
