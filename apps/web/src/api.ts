@@ -3,6 +3,6 @@ import { hc } from "hono/client";
 import { isDev } from "./env";
 
 const client = hc<AppType>(
-  isDev ? "http://localhost:3000" : "https://example.com",
+  isDev ? "http://localhost:3000" : "https://api.armand-salle.fr",
 );
 export const api = client.api.v1;
