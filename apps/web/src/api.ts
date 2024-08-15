@@ -10,7 +10,9 @@ const client = hc<AppType>(
     },
     init: {
       credentials: "include",
+      mode: "cors",
     },
   },
 );
+
 export const api = client.api.v1;
