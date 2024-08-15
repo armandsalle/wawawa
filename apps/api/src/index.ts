@@ -27,6 +27,7 @@ app.use(
           "https://api-wawawa.fly.dev",
           "https://wawawa.pages.dev",
         ],
+    credentials: true,
   }),
 );
 app.use(honoLogger());

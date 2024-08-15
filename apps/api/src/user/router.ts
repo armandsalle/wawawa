@@ -1,12 +1,53 @@
+import { getAuth } from "@hono/clerk-auth";
 import { vValidator } from "@hono/valibot-validator";
 import { Hono } from "hono";
 import * as v from "valibot";
+import { logger } from "../logger";
 import { insertUserSchema } from "../user/schema";
 import { userStore } from "../user/services";
 
+declare module "hono" {
+  interface ContextVariableMap {
+    userId: string;
+  }
+}
+
 export const userRouter = new Hono()
+  .use(async (c, next) => {
+    const auth = getAuth(c);
+
+    if (!auth?.userId) {
+      return c.json(
+        {
+          message: "You are not logged in.",
+        },
+        401,
+      );
+    }
+
+    c.set("userId", auth.userId);
+
+    await next();
+  })
   .basePath("/users")
+  .get("/me", async (c) => {
+    const auth = getAuth(c);
+
+    if (!auth?.userId) {
+      return c.json({
+        message: "You are not logged in.",
+      });
+    }
+
+    return c.json({
+      message: "You are logged in!",
+      userId: auth.userId,
+    });
+  })
+
   .get("/", async (c) => {
+    const userId = c.get("userId");
+    logger.info(`User ${userId} is fetching users`);
     const users = await userStore.getUsers();
     return c.json(users);
   })

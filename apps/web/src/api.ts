@@ -4,5 +4,13 @@ import { isDev } from "./env";
 
 const client = hc<AppType>(
   isDev ? "http://localhost:3000" : "https://api.armand-salle.fr",
+  {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    init: {
+      credentials: "include",
+    },
+  },
 );
 export const api = client.api.v1;

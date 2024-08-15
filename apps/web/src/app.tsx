@@ -1,20 +1,50 @@
 import {
+  ClerkProvider,
+  SignInButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+  useClerk,
+} from "@clerk/clerk-react";
+import {
   QueryClient,
   QueryClientProvider,
   useMutation,
   useSuspenseQuery,
 } from "@tanstack/react-query";
 import type { InferRequestType } from "hono";
-import { Suspense } from "react";
-import { ErrorBoundary } from "react-error-boundary";
+import { Suspense, useEffect } from "react";
+import { ErrorBoundary, type FallbackProps } from "react-error-boundary";
 import { api } from "./api";
 
-const queryClient = new QueryClient();
+const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+
+if (!PUBLISHABLE_KEY) {
+  throw new Error("Missing Publishable Key");
+}
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+    },
+  },
+});
 
 const useUsers = () =>
   useSuspenseQuery({
     queryKey: ["users"],
-    queryFn: () => api.users.$get().then((res) => res.json()),
+    queryFn: async () => {
+      const res = await api.users.$get();
+      if (res.ok) {
+        return await res.json();
+      }
+
+      if (res.status === 401) {
+        throw new Error("Unauthorized");
+      }
+      throw new Error("Unexpected error");
+    },
   });
 useUsers.invalidate = () =>
   queryClient.invalidateQueries({ queryKey: ["users"] });
@@ -108,20 +138,68 @@ function CreateUser() {
   );
 }
 
+function Fallback({ error }: FallbackProps) {
+  return (
+    <div role="alert">
+      <p>Something went wrong:</p>
+      <pre style={{ color: "red" }}>{error.message}</pre>
+    </div>
+  );
+}
+
 export function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <div className="p-4">
-        <Test />
-        <ErrorBoundary fallback={<div>Error</div>}>
-          <Suspense fallback={<p>waiting for message...</p>}>
-            <div className="flex flex-col gap-4">
-              <Users />
-              <CreateUser />
-            </div>
-          </Suspense>
-        </ErrorBoundary>
-      </div>
-    </QueryClientProvider>
+    <ClerkProvider
+      publishableKey={PUBLISHABLE_KEY}
+      afterSignOutUrl="/"
+      signInForceRedirectUrl="/login-success"
+    >
+      <QueryClientProvider client={queryClient}>
+        <COmp />
+        <div className="p-4">
+          <header>
+            <SignedOut>
+              <SignInButton />
+            </SignedOut>
+            <SignedIn>
+              <UserButton />
+            </SignedIn>
+          </header>
+          <Test />
+          <ErrorBoundary FallbackComponent={Fallback}>
+            <Suspense fallback={<p>waiting for message...</p>}>
+              <div className="flex flex-col gap-4">
+                <Users />
+                <CreateUser />
+              </div>
+            </Suspense>
+          </ErrorBoundary>
+        </div>
+      </QueryClientProvider>
+    </ClerkProvider>
   );
+}
+
+function COmp() {
+  const { loaded } = useClerk();
+
+  useEffect(() => {
+    if (!loaded) {
+      return;
+    }
+
+    const { pathname } = window.location;
+
+    if (pathname === "/login-success") {
+      queryClient
+        .invalidateQueries({
+          type: "all",
+        })
+        .then(() => {
+          window.history.pushState({}, "", "/");
+        });
+    }
+  }, [loaded]);
+
+  return null;
 }
