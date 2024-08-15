@@ -22,7 +22,11 @@ app.use(
   cors({
     origin: isDev
       ? ["http://localhost:5173", "https://api-wawawa.fly.dev"]
-      : ["https://api.armand-salle.fr", "https://api-wawawa.fly.dev"],
+      : [
+          "https://api.armand-salle.fr",
+          "https://api-wawawa.fly.dev",
+          "https://wawawa.pages.dev/",
+        ],
   }),
 );
 app.use(honoLogger());
