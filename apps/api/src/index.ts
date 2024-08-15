@@ -25,7 +25,7 @@ app.use(
       : [
           "https://api.armand-salle.fr",
           "https://api-wawawa.fly.dev",
-          "https://wawawa.pages.dev/",
+          "https://wawawa.pages.dev",
         ],
   }),
 );

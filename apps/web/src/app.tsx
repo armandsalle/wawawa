@@ -7,6 +7,7 @@ import {
 } from "@tanstack/react-query";
 import type { InferRequestType, InferResponseType } from "hono";
 import { Suspense } from "react";
+import { ErrorBoundary } from "react-error-boundary";
 import { api } from "./api";
 
 const queryClient = new QueryClient();
@@ -151,12 +152,14 @@ export function App() {
     <QueryClientProvider client={queryClient}>
       <div className="p-4">
         <Test />
-        <Suspense fallback={<p>waiting for message...</p>}>
-          <div className="flex flex-col gap-4">
-            <Users />
-            <CreateUser />
-          </div>
-        </Suspense>
+        <ErrorBoundary fallback={<div>Error</div>}>
+          <Suspense fallback={<p>waiting for message...</p>}>
+            <div className="flex flex-col gap-4">
+              <Users />
+              <CreateUser />
+            </div>
+          </Suspense>
+        </ErrorBoundary>
       </div>
     </QueryClientProvider>
   );
