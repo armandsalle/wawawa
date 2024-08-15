@@ -26,8 +26,10 @@ app.use(
           "https://api.armand-salle.fr",
           "https://api-wawawa.fly.dev",
           "https://wawawa.pages.dev",
+          "https://wawawa.armand-salle.fr",
         ],
     credentials: true,
+    allowMethods: ["POST", "GET", "OPTIONS", "PUT", "DELETE"],
   }),
 );
 app.use(honoLogger());
