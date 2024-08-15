@@ -31,8 +31,8 @@ const queryClient = new QueryClient({
   },
 });
 
-const useUsers = () =>
-  useSuspenseQuery({
+const useUsers = () => {
+  return useSuspenseQuery({
     queryKey: ["users"],
     queryFn: async () => {
       const res = await api.users.$get();
@@ -46,6 +46,7 @@ const useUsers = () =>
       throw new Error("Unexpected error");
     },
   });
+};
 useUsers.invalidate = () =>
   queryClient.invalidateQueries({ queryKey: ["users"] });
 
