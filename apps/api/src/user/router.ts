@@ -1,6 +1,7 @@
 import { getAuth } from "@hono/clerk-auth";
 import { vValidator } from "@hono/valibot-validator";
 import { Hono } from "hono";
+import { getCookie } from "hono/cookie";
 import * as v from "valibot";
 import { logger } from "../logger";
 import { insertUserSchema } from "../user/schema";
@@ -14,6 +15,8 @@ declare module "hono" {
 
 export const userRouter = new Hono()
   .use(async (c, next) => {
+    const cookies = getCookie(c);
+    console.log(cookies);
     const auth = getAuth(c);
 
     if (!auth?.userId) {
@@ -26,6 +29,7 @@ export const userRouter = new Hono()
     }
 
     c.set("userId", auth.userId);
+    logger.info(`User ${auth.userId} is accessing the user API`);
 
     await next();
   })
