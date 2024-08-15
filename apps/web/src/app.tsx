@@ -1,11 +1,10 @@
 import {
   QueryClient,
   QueryClientProvider,
-  type Updater,
   useMutation,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-import type { InferRequestType, InferResponseType } from "hono";
+import type { InferRequestType } from "hono";
 import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { api } from "./api";
@@ -19,13 +18,6 @@ const useUsers = () =>
   });
 useUsers.invalidate = () =>
   queryClient.invalidateQueries({ queryKey: ["users"] });
-useUsers.cancel = () => queryClient.cancelQueries({ queryKey: ["users"] });
-useUsers.getQueryData = () => queryClient.getQueryData(["users"]) as ResType;
-useUsers.setQueryData = (
-  data: Updater<ResType | undefined, ResType | undefined>,
-) => {
-  queryClient.setQueryData<ResType>(["users"], data);
-};
 
 function Test() {
   return <h1 className="mb-4 font-medium text-2xl">Hello world</h1>;
@@ -39,18 +31,6 @@ function Users() {
       await api.users[":id"].$delete({
         param: { id },
       });
-    },
-    onMutate: async (id) => {
-      await useUsers.cancel();
-      const previousUsers = useUsers.getQueryData();
-      useUsers.setQueryData((old) =>
-        old?.filter((user) => user.id !== Number(id)),
-      );
-
-      return { previousUsers };
-    },
-    onError: (_, __, context) => {
-      useUsers.setQueryData(context?.previousUsers);
     },
     onSettled: () => {
       useUsers.invalidate();
@@ -84,7 +64,6 @@ function Users() {
 }
 
 type ReqType = InferRequestType<typeof api.users.$post>["json"];
-type ResType = InferResponseType<typeof api.users.$get>;
 
 function CreateUser() {
   const { mutate } = useMutation({
@@ -97,24 +76,6 @@ function CreateUser() {
         .then((res) => res.json());
 
       useUsers.invalidate();
-    },
-    onMutate: async (json) => {
-      await useUsers.cancel();
-      const previousUsers = useUsers.getQueryData();
-      useUsers.setQueryData((old) => [
-        ...(old ?? []),
-        {
-          id: Math.round(Math.random() * 100),
-          ...json,
-          createdAt: new Date().toISOString(),
-          updateAt: null,
-        },
-      ]);
-
-      return { previousUsers };
-    },
-    onError: (_, __, context) => {
-      useUsers.setQueryData(context?.previousUsers);
     },
     onSettled: () => {
       useUsers.invalidate();

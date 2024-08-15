@@ -45,7 +45,6 @@ app.get("/health", (c) => {
 });
 
 const route = app.route("/api/v1", appRouter);
-
 /**
  * Run the app.
  */
