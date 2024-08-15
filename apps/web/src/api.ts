@@ -11,6 +11,7 @@ const client = hc<AppType>(
     init: {
       credentials: "include",
       mode: "cors",
+      referrer: "",
     },
   },
 );
