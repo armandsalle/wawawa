@@ -9,6 +9,7 @@ export const appRouter = new Hono()
     clerkMiddleware({
       secretKey: env.CLERK_SECRET_KEY,
       publishableKey: env.CLERK_PUBLISHABLE_KEY,
+      jwtKey: env.CLERK_JWT_KEY,
     }),
   )
   .route("/", userRouter);

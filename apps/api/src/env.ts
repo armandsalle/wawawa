@@ -5,6 +5,7 @@ function getEnv() {
   const TURSO_ENCRYPTION_KEY = process.env.TURSO_ENCRYPTION_KEY;
   const CLERK_SECRET_KEY = process.env.CLERK_SECRET_KEY;
   const CLERK_PUBLISHABLE_KEY = process.env.CLERK_PUBLISHABLE_KEY;
+  const CLERK_JWT_KEY = process.env.CLERK_JWT_KEY;
 
   if (!MODE) {
     throw new Error("MODE must be set");
@@ -22,6 +23,10 @@ function getEnv() {
     throw new Error("CLERK_SECRET_KEY and CLERK_PUBLISHABLE_KEY must be set");
   }
 
+  if (!CLERK_JWT_KEY) {
+    throw new Error("CLERK_JWT_KEY must be set");
+  }
+
   return {
     TURSO_CONNECTION_URL,
     TURSO_AUTH_TOKEN,
@@ -29,6 +34,7 @@ function getEnv() {
     MODE,
     CLERK_SECRET_KEY,
     CLERK_PUBLISHABLE_KEY,
+    CLERK_JWT_KEY,
   } as const;
 }
 

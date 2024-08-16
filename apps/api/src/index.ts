@@ -28,7 +28,6 @@ app.use(
           "https://wawawa.pages.dev",
           "https://wawawa.armand-salle.fr",
         ],
-    credentials: true,
     allowMethods: ["POST", "GET", "OPTIONS", "PUT", "DELETE"],
   }),
 );

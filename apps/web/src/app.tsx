@@ -15,13 +15,7 @@ import {
 import type { InferRequestType } from "hono";
 import { Suspense, useEffect } from "react";
 import { ErrorBoundary, type FallbackProps } from "react-error-boundary";
-import { api } from "./api";
-
-const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
-
-if (!PUBLISHABLE_KEY) {
-  throw new Error("Missing Publishable Key");
-}
+import { type APIClient, PUBLISHABLE_KEY, api, clerk } from "./api";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -35,7 +29,9 @@ const useUsers = () => {
   return useSuspenseQuery({
     queryKey: ["users"],
     queryFn: async () => {
-      const res = await api.users.$get();
+      const client = await api();
+      const res = await client.users.$get();
+
       if (res.ok) {
         return await res.json();
       }
@@ -59,7 +55,8 @@ function Users() {
   const { mutate } = useMutation({
     mutationKey: ["deleteUser"],
     mutationFn: async (id: string) => {
-      await api.users[":id"].$delete({
+      const client = await api();
+      await client.users[":id"].$delete({
         param: { id },
       });
     },
@@ -94,13 +91,15 @@ function Users() {
   );
 }
 
-type ReqType = InferRequestType<typeof api.users.$post>["json"];
+type ReqType = InferRequestType<APIClient["users"]["$post"]>["json"];
 
 function CreateUser() {
   const { mutate } = useMutation({
     mutationKey: ["createUser"],
     mutationFn: async (json: ReqType) => {
-      await api.users
+      const client = await api();
+
+      await client.users
         .$post({
           json,
         })
@@ -152,6 +151,7 @@ export function App() {
   return (
     <ClerkProvider
       publishableKey={PUBLISHABLE_KEY}
+      Clerk={clerk}
       afterSignOutUrl="/"
       signInForceRedirectUrl="/login-success"
     >
