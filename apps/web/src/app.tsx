@@ -5,6 +5,7 @@ import {
   SignedOut,
   UserButton,
   useClerk,
+  useUser,
 } from "@clerk/clerk-react";
 import {
   QueryClient,
@@ -13,7 +14,7 @@ import {
   useSuspenseQuery,
 } from "@tanstack/react-query";
 import type { InferRequestType } from "hono";
-import { Suspense, useEffect } from "react";
+import { type PropsWithChildren, Suspense, useEffect } from "react";
 import { ErrorBoundary, type FallbackProps } from "react-error-boundary";
 import { type APIClient, PUBLISHABLE_KEY, api, clerk } from "./api";
 
@@ -147,6 +148,21 @@ function Fallback({ error }: FallbackProps) {
   );
 }
 
+function Loader({ children }: PropsWithChildren) {
+  const { loaded } = useClerk();
+  return <div className="">{loaded ? children : "loading"}</div>;
+}
+
+function Header() {
+  const { isSignedIn, isLoaded } = useUser();
+
+  return (
+    <header className="h-7">
+      {isLoaded ? isSignedIn ? <UserButton /> : <SignInButton /> : "Loading"}
+    </header>
+  );
+}
+
 export function App() {
   return (
     <ClerkProvider
@@ -158,23 +174,18 @@ export function App() {
       <QueryClientProvider client={queryClient}>
         <COmp />
         <div className="p-4">
-          <header>
-            <SignedOut>
-              <SignInButton />
-            </SignedOut>
-            <SignedIn>
-              <UserButton />
-            </SignedIn>
-          </header>
+          <Header />
           <Test />
-          <ErrorBoundary FallbackComponent={Fallback}>
-            <Suspense fallback={<p>waiting for message...</p>}>
-              <div className="flex flex-col gap-4">
-                <Users />
-                <CreateUser />
-              </div>
-            </Suspense>
-          </ErrorBoundary>
+          <Loader>
+            <div className="flex flex-col gap-4">
+              <ErrorBoundary FallbackComponent={Fallback}>
+                <Suspense fallback={<p>waiting for message...</p>}>
+                  <Users />
+                </Suspense>
+              </ErrorBoundary>
+              <CreateUser />
+            </div>
+          </Loader>
         </div>
       </QueryClientProvider>
     </ClerkProvider>
