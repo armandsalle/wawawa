@@ -7,6 +7,7 @@ import { migrate } from "./db";
 import { isDev } from "./env";
 import { migrationsDir } from "./helpers";
 import { logger } from "./logger";
+import { webhooksRouter } from "./webhooks";
 
 /**
  * Migrate the database before starting the server.
@@ -36,17 +37,20 @@ app.use(honoLogger());
 /**
  * Define routes.
  */
-app.get("/", (c) => {
-  return c.text("OK");
-});
-app.get("/ping", (c) => {
-  return c.text("PONG");
-});
-app.get("/health", (c) => {
-  return c.json({ status: "ok" });
-});
+app
+  .get("/", (c) => {
+    return c.text("OK");
+  })
+  .get("/ping", (c) => {
+    return c.text("PONG");
+  })
+  .get("/health", (c) => {
+    return c.json({ status: "ok" });
+  })
+  .route("/webhooks", webhooksRouter);
 
 const route = app.route("/api/v1", appRouter);
+
 /**
  * Run the app.
  */

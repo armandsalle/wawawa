@@ -1,6 +1,7 @@
 import { clerkMiddleware } from "@hono/clerk-auth";
 import { Hono } from "hono";
 import { env } from "../env";
+import { storageRouter } from "../storage/router";
 import { userRouter } from "../user/router";
 
 export const appRouter = new Hono()
@@ -12,4 +13,5 @@ export const appRouter = new Hono()
       jwtKey: env.CLERK_JWT_KEY,
     }),
   )
-  .route("/", userRouter);
+  .route("/", userRouter)
+  .route("/", storageRouter);

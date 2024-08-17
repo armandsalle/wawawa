@@ -1,11 +1,17 @@
 import { sql } from "drizzle-orm";
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import {
+  integer,
+  sqliteTable,
+  text,
+  uniqueIndex,
+} from "drizzle-orm/sqlite-core";
 import * as v from "valibot";
 
 export const usersTable = sqliteTable("users", {
   id: integer("id").primaryKey(),
   name: text("name").notNull(),
   email: text("email").unique().notNull(),
+  clerkId: text("clerk_id").unique().notNull(),
 
   createdAt: text("created_at").default(sql`(CURRENT_TIMESTAMP)`).notNull(),
   updateAt: integer("updated_at", { mode: "timestamp" }).$onUpdate(

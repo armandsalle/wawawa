@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1722779046070,
-      "tag": "0000_closed_mercury",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1723732010288,
-      "tag": "0001_fat_quicksilver",
+      "when": 1723930541536,
+      "tag": "0000_tearful_omega_red",
       "breakpoints": true
     }
   ]

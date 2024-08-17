@@ -6,10 +6,12 @@
     "dev": "bun run --hot src/index.ts",
     "start": "NODE_ENV=production bun run src/index.ts",
     "typecheck": "tsc --noEmit",
-    "db:generate": "bunx --bun drizzle-kit generate",
-    "db:migrate": "bunx --bun drizzle-kit migrate"
+    "db:generate": "bunx drizzle-kit generate",
+    "db:migrate": "bunx drizzle-kit migrate"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.633.0",
+    "@aws-sdk/s3-request-presigner": "^3.633.0",
     "@clerk/backend": "^1.6.3",
     "@hono/clerk-auth": "^2.0.0",
     "@hono/valibot-validator": "^0.3.0",
@@ -20,6 +22,7 @@
     "hono": "^4.5.5",
     "pino": "^9.3.2",
     "pino-pretty": "^11.2.2",
+    "svix": "^1.30.0",
     "valibot": "^0.37.0"
   },
   "devDependencies": {

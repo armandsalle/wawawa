@@ -1,8 +1,6 @@
 import {
   ClerkProvider,
   SignInButton,
-  SignedIn,
-  SignedOut,
   UserButton,
   useClerk,
   useUser,
@@ -10,13 +8,11 @@ import {
 import {
   QueryClient,
   QueryClientProvider,
-  useMutation,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-import type { InferRequestType } from "hono";
 import { type PropsWithChildren, Suspense, useEffect } from "react";
 import { ErrorBoundary, type FallbackProps } from "react-error-boundary";
-import { type APIClient, PUBLISHABLE_KEY, api, clerk } from "./api";
+import { PUBLISHABLE_KEY, api, clerk } from "./api";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -47,93 +43,76 @@ const useUsers = () => {
 useUsers.invalidate = () =>
   queryClient.invalidateQueries({ queryKey: ["users"] });
 
-function Test() {
-  return <h1 className="mb-4 font-medium text-2xl">Hello world</h1>;
-}
-
-function Users() {
-  const { data: usersData } = useUsers();
-  const { mutate } = useMutation({
-    mutationKey: ["deleteUser"],
-    mutationFn: async (id: string) => {
+function ListImages() {
+  const { data } = useSuspenseQuery({
+    queryKey: ["test"],
+    staleTime: Number.POSITIVE_INFINITY,
+    queryFn: async () => {
       const client = await api();
-      await client.users[":id"].$delete({
-        param: { id },
-      });
-    },
-    onSettled: () => {
-      useUsers.invalidate();
+      const res = await client.storage["list-images"].$get();
+
+      if (res.ok) {
+        return await res.json();
+      }
+
+      if (res.status === 401) {
+        throw new Error("Unauthorized");
+      }
+
+      throw new Error("Unexpected");
     },
   });
 
-  if (usersData.length === 0) {
-    return <p className="text-slate-600 text-sm">No users found</p>;
-  }
-
   return (
-    <ul className="menu w-56 rounded-box bg-base-200">
-      {usersData.map((user) => (
-        <li key={user.id}>
-          <div className="flex justify-between">
-            <p>{user.name}</p>
-            <button
-              type="button"
-              className="btn btn-error btn-sm"
-              onClick={() => {
-                mutate(user.id.toString());
-              }}
-            >
-              Delete
-            </button>
+    <div>
+      <h1 className="mb-4 font-medium text-2xl">Hello world</h1>
+      <div>
+        {data.map((image) => (
+          <div className="avatar" key={image.url}>
+            <div className="w-24 rounded">
+              {image.contentType?.includes("pdf") ? (
+                <iframe src={image.url} title="pdf" />
+              ) : (
+                <img src={image.url} alt="" />
+              )}
+            </div>
           </div>
-        </li>
-      ))}
-    </ul>
+        ))}
+      </div>
+    </div>
   );
 }
 
-type ReqType = InferRequestType<APIClient["users"]["$post"]>["json"];
+function UploadFile() {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const file = formData.get("file") as File;
+    const { name: fileName, type: contentType } = file;
 
-function CreateUser() {
-  const { mutate } = useMutation({
-    mutationKey: ["createUser"],
-    mutationFn: async (json: ReqType) => {
-      const client = await api();
+    const client = await api();
+    const res = await client.storage["upload-image-url"].$post({
+      json: {
+        fileName,
+        contentType,
+      },
+    });
+    const uploadUrl = await res.json();
 
-      await client.users
-        .$post({
-          json,
-        })
-        .then((res) => res.json());
+    const put = await fetch(uploadUrl, {
+      method: "PUT",
+      body: file,
+    });
 
-      useUsers.invalidate();
-    },
-    onSettled: () => {
-      useUsers.invalidate();
-    },
-  });
-  async function formAction(formData: FormData) {
-    const email = formData.get("email") as string;
-    const name = formData.get("name") as string;
-    mutate({ email, name });
+    const ok = put.ok;
+    console.log(`Upload status: ${ok ? "success" : "failed"}`);
   }
 
   return (
-    <form action={formAction} className="flex flex-col items-start gap-2">
-      <input
-        type="email"
-        name="email"
-        placeholder="Email"
-        className="input input-bordered"
-      />
-      <input
-        type="text"
-        name="name"
-        placeholder="Name"
-        className="input input-bordered"
-      />
-      <button type="submit" className="btn btn-neutral">
-        Send
+    <form onSubmit={handleSubmit} className="flex flex-col items-start">
+      <input type="file" name="file" className="file-input" />
+      <button type="submit" className="btn btn-outline btn-success">
+        Upload
       </button>
     </form>
   );
@@ -150,7 +129,12 @@ function Fallback({ error }: FallbackProps) {
 
 function Loader({ children }: PropsWithChildren) {
   const { loaded } = useClerk();
-  return <div className="">{loaded ? children : "loading"}</div>;
+  const { isSignedIn } = useUser();
+  return (
+    <div className="">
+      {loaded ? (isSignedIn ? children : "not loged in ") : "loading"}
+    </div>
+  );
 }
 
 function Header() {
@@ -172,19 +156,18 @@ export function App() {
       signInForceRedirectUrl="/login-success"
     >
       <QueryClientProvider client={queryClient}>
-        <COmp />
+        <RedirectAfterLogin />
         <div className="p-4">
           <Header />
-          <Test />
           <Loader>
-            <div className="flex flex-col gap-4">
-              <ErrorBoundary FallbackComponent={Fallback}>
-                <Suspense fallback={<p>waiting for message...</p>}>
-                  <Users />
-                </Suspense>
-              </ErrorBoundary>
-              <CreateUser />
-            </div>
+            <ErrorBoundary FallbackComponent={Fallback}>
+              <Suspense fallback={<p>waiting for message...</p>}>
+                <ListImages />
+                <div className="flex flex-col gap-4">
+                  <UploadFile />
+                </div>
+              </Suspense>
+            </ErrorBoundary>
           </Loader>
         </div>
       </QueryClientProvider>
@@ -192,7 +175,7 @@ export function App() {
   );
 }
 
-function COmp() {
+function RedirectAfterLogin() {
   const { loaded } = useClerk();
 
   useEffect(() => {
