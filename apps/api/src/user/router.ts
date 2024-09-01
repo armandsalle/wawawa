@@ -1,5 +1,4 @@
 import { Hono } from "hono";
-import { logger } from "../logger";
 import { authMiddleware } from "../middlewares/auth-middlewares";
 import { userStore } from "../user/services";
 
@@ -7,19 +6,7 @@ export const userRouter = new Hono()
   .use(authMiddleware)
   .basePath("/users")
   .get("/me", async (c) => {
-    const userId = c.get("userId");
-
-    const user = await userStore.byClerkId(userId);
-
-    if (!user) {
-      logger.error(`User ${userId} not found`);
-      return c.json(
-        {
-          message: "User not found.",
-        },
-        404,
-      );
-    }
+    const user = c.get("currentUser");
 
     return c.json({
       user,

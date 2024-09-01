@@ -1,0 +1,1 @@
+ALTER TABLE `documents` ADD `content_type` text NOT NULL;

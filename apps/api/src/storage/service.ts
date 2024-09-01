@@ -4,10 +4,22 @@ import {
   PutObjectCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { eq } from "drizzle-orm";
+import { HTTPException } from "hono/http-exception";
 import { S3 } from "../clients/s3";
+import { db } from "../db";
 import { env } from "../env";
+import { documentsTable } from "./schema";
 
 export const storageService = {
+  generateStorageKey: (userId: number, fileName: string) => {
+    return `${env.MODE}/${userId.toString()}/${fileName}`;
+  },
+
+  getStoragePrefix: (userId: number) => {
+    return `${env.MODE}/${userId.toString()}/`;
+  },
+
   getSignedUploadUrl: async ({
     fileName,
     contentType,
@@ -15,16 +27,16 @@ export const storageService = {
   }: {
     fileName: string;
     contentType: string;
-    userId: string;
+    userId: number;
   }) => {
     const signedUrl = await getSignedUrl(
       S3,
       new PutObjectCommand({
         Bucket: env.BUCKET_NAME,
-        Key: `${userId}/${fileName}`,
+        Key: storageService.generateStorageKey(userId, fileName),
         ContentType: contentType,
         Metadata: {
-          userId,
+          userId: userId.toString(),
         },
       }),
       {
@@ -36,10 +48,60 @@ export const storageService = {
     return signedUrl;
   },
 
-  listImages: async (userId: string) => {
+  getSignedGetObjectUrl: async ({
+    fileName,
+    userId,
+  }: {
+    fileName: string;
+    userId: number;
+  }) => {
+    const signedUrl = await getSignedUrl(
+      S3,
+      new GetObjectCommand({
+        Bucket: env.BUCKET_NAME,
+        Key: storageService.generateStorageKey(userId, fileName),
+      }),
+      {
+        // 2 minutes
+        expiresIn: 86_400,
+      },
+    );
+
+    return signedUrl;
+  },
+
+  addDocument: async ({
+    userId,
+    uri,
+    contentType,
+  }: {
+    userId: number;
+    uri: string;
+    contentType: string;
+  }) => {
+    return db
+      .insert(documentsTable)
+      .values({
+        userId,
+        uri,
+        contentType,
+      })
+      .returning({
+        id: documentsTable.id,
+      });
+  },
+
+  listImages: async (userId: number) => {
+    return await db
+      .select()
+      .from(documentsTable)
+      .where(eq(documentsTable.userId, userId))
+      .limit(100);
+  },
+  listImagesFromTigris: async (userId: number) => {
     const command = new ListObjectsV2Command({
       Bucket: env.BUCKET_NAME,
-      Prefix: `${userId}/`,
+      Prefix: storageService.getStoragePrefix(userId),
     });
 
     const objs = await S3.send(command);
@@ -56,19 +118,23 @@ export const storageService = {
           Key: obj.Key,
         });
 
-        const metadata = await S3.headObject({
-          Bucket: env.BUCKET_NAME,
-          Key: obj.Key,
-        });
-        console.log(metadata);
+        const [metadata, signedUrl] = await Promise.allSettled([
+          await S3.headObject({
+            Bucket: env.BUCKET_NAME,
+            Key: obj.Key,
+          }),
+          await getSignedUrl(S3, objectCommand, {
+            expiresIn: 86_400,
+          }),
+        ]);
 
-        const signedUrl = await getSignedUrl(S3, objectCommand, {
-          expiresIn: 86_400,
-        });
+        if (metadata.status === "rejected" || signedUrl.status === "rejected") {
+          throw new HTTPException(500, { message: "Failed to get signed url" });
+        }
 
         res.add({
-          url: signedUrl,
-          contentType: metadata.ContentType,
+          url: signedUrl.value,
+          contentType: metadata.value.ContentType,
         });
       }
     }

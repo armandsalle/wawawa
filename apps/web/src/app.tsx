@@ -105,7 +105,21 @@ function UploadFile() {
     });
 
     const ok = put.ok;
-    console.log(`Upload status: ${ok ? "success" : "failed"}`);
+
+    if (ok) {
+      const res = await client.storage["sync-image"].$post({
+        json: {
+          fileName,
+          contentType,
+        },
+      });
+
+      if (res.ok) {
+        queryClient.invalidateQueries({
+          queryKey: ["test"],
+        });
+      }
+    }
   }
 
   return (

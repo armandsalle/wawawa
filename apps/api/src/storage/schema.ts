@@ -6,6 +6,7 @@ import { usersTable } from "../user/schema";
 export const documentsTable = sqliteTable("documents", {
   id: integer("id").primaryKey(),
   uri: text("uri").notNull(),
+  contentType: text("content_type").notNull(),
   userId: integer("user_id")
     .notNull()
     .references(() => usersTable.id),
@@ -15,6 +16,7 @@ export const documentsTable = sqliteTable("documents", {
 
 export const insertDocumentSchema = v.object({
   uri: v.pipe(v.string(), v.trim(), v.minLength(1)),
+  contentType: v.pipe(v.string(), v.trim(), v.minLength(1)),
   userId: v.pipe(v.number(), v.integer(), v.minValue(1)),
 });
 
