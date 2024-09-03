@@ -57,7 +57,7 @@ export const storageRouter = new Hono()
 
     const images = await storageService.listImages(Number(userId));
 
-    const res: { url: string; contentType: string }[] = [];
+    const res: { url: string; contentType: string; uri: string }[] = [];
 
     for (const image of images) {
       const url = await storageService.getSignedGetObjectUrl({
@@ -66,10 +66,19 @@ export const storageRouter = new Hono()
       });
 
       res.push({
+        uri: image.uri,
         url,
         contentType: image.contentType,
       });
     }
+
+    return c.json(res);
+  })
+  .delete("/delete-image", vValidator("json", v.string()), async (c) => {
+    const userId = c.get("currentUser").id;
+    const filename = c.req.valid("json");
+
+    const res = await storageService.deleteImage(userId, filename);
 
     return c.json(res);
   });

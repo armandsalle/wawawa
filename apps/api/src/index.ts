@@ -46,8 +46,9 @@ app
   })
   .get("/health", (c) => {
     return c.json({ status: "ok" });
-  })
-  .route("/webhooks", webhooksRouter);
+  });
+
+app.route("/webhooks", webhooksRouter);
 
 const route = app.route("/api/v1", appRouter);
 

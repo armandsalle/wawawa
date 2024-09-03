@@ -8,6 +8,7 @@ import {
 import {
   QueryClient,
   QueryClientProvider,
+  useMutation,
   useSuspenseQuery,
 } from "@tanstack/react-query";
 import { type PropsWithChildren, Suspense, useEffect } from "react";
@@ -44,7 +45,7 @@ useUsers.invalidate = () =>
   queryClient.invalidateQueries({ queryKey: ["users"] });
 
 function ListImages() {
-  const { data } = useSuspenseQuery({
+  const { data, refetch } = useSuspenseQuery({
     queryKey: ["test"],
     staleTime: Number.POSITIVE_INFINITY,
     queryFn: async () => {
@@ -63,19 +64,41 @@ function ListImages() {
     },
   });
 
+  const mutation = useMutation({
+    mutationKey: ["test-delete"],
+    mutationFn: async (fileName: string) => {
+      const client = await api();
+      const res = await client.storage["delete-image"].$delete({
+        json: fileName,
+      });
+
+      return res;
+    },
+    onSuccess: () => {
+      refetch();
+    },
+  });
+
   return (
     <div>
       <h1 className="mb-4 font-medium text-2xl">Hello world</h1>
       <div>
         {data.map((image) => (
-          <div className="avatar" key={image.url}>
-            <div className="w-24 rounded">
-              {image.contentType?.includes("pdf") ? (
-                <iframe src={image.url} title="pdf" />
-              ) : (
-                <img src={image.url} alt="" />
-              )}
-            </div>
+          <div className="w-32 rounded" key={image.url}>
+            {image.contentType?.includes("pdf") ? (
+              <iframe src={image.url} title="pdf" />
+            ) : (
+              <div className="space-y-2">
+                <img src={image.url} alt="" className="w-full" />
+                <button
+                  type="button"
+                  className="btn btn-warning btn-sm"
+                  onClick={() => mutation.mutate(image.uri)}
+                >
+                  Supprimer
+                </button>
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -177,7 +200,7 @@ export function App() {
             <ErrorBoundary FallbackComponent={Fallback}>
               <Suspense fallback={<p>waiting for message...</p>}>
                 <ListImages />
-                <div className="flex flex-col gap-4">
+                <div className="mt-4 flex flex-col gap-4">
                   <UploadFile />
                 </div>
               </Suspense>

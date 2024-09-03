@@ -1,14 +1,16 @@
 import {
+  DeleteObjectCommand,
   GetObjectCommand,
   ListObjectsV2Command,
   PutObjectCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import { S3 } from "../clients/s3";
 import { db } from "../db";
 import { env } from "../env";
+import { logger } from "../logger";
 import { documentsTable } from "./schema";
 
 export const storageService = {
@@ -140,5 +142,16 @@ export const storageService = {
     }
 
     return [...res];
+  },
+
+  deleteImage: (userId: number, fileName: string) => {
+    return db
+      .delete(documentsTable)
+      .where(
+        and(
+          eq(documentsTable.userId, userId),
+          eq(documentsTable.uri, fileName),
+        ),
+      );
   },
 };
